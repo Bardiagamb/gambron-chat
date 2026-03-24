@@ -17,7 +17,10 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = !!process.env.RENDER;
+
+console.log('isProd:', isProd);
+console.log('NODE_ENV:', process.env.NODE_ENV);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
