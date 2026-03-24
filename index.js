@@ -12,15 +12,11 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
+  console.log(`${req.method} ${req.url} | session user: ${req.session?.user?.username || 'none'}`);
   next();
 });
 
 const PORT = process.env.PORT || 3000;
-const isProd = !!process.env.RENDER;
-
-console.log('isProd:', isProd);
-console.log('NODE_ENV:', process.env.NODE_ENV);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -32,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  resave: false,
+  resave: true,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
@@ -41,8 +37,8 @@ app.use(session({
   cookie: {
     maxAge: 1000 * 60 * 60 * 24,
     httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax'
+    secure: false,
+    sameSite: 'lax'
   }
 }));
 
