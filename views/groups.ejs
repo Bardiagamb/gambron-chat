@@ -1,0 +1,43 @@
+<%- include('partials/header', { title: 'Your Chats' }) %>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <h2>Your Chats</h2>
+      <p class="subtext"><%= groupCount %> group<%= groupCount !== 1 ? 's' : '' %></p>
+    </div>
+    <a href="/groups/new" class="btn btn-primary">+ New Group</a>
+  </div>
+
+  <% if (groups.length === 0) { %>
+    <div class="empty-state">
+      <span class="empty-icon">💬</span>
+      <p>No chats yet. Create one to get started!</p>
+    </div>
+  <% } else { %>
+    <ul class="group-list">
+      <% groups.forEach(group => { %>
+        <li class="group-item">
+          <a href="/groups/<%= group.id %>" class="group-link">
+            <div class="group-avatar"><%= group.name.charAt(0).toUpperCase() %></div>
+            <div class="group-info">
+              <span class="group-name"><%= group.name %></span>
+              <span class="group-meta">
+                <% if (group.last_message_at) { %>
+                  <%= new Date(group.last_message_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                <% } else { %>
+                  No messages yet
+                <% } %>
+              </span>
+            </div>
+            <% if (group.unread_count > 0) { %>
+              <span class="badge-unread"><%= group.unread_count %></span>
+            <% } %>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,11 @@
+<%- include('partials/header', { title: 'Error ' + code }) %>
+
+<div class="auth-page">
+  <div class="auth-card auth-card--error">
+    <div class="error-code"><%= code %></div>
+    <p class="error-msg"><%= message %></p>
+    <a href="/groups" class="btn btn-primary">Go Home</a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

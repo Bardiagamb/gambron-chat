@@ -1,0 +1,42 @@
+<%- include('partials/header', { title: 'New Group' }) %>
+
+<div class="page-wrap page-wrap--narrow">
+  <div class="page-header">
+    <div>
+      <a href="/groups" class="back-link">← Back</a>
+      <h2>Create Group</h2>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert alert-error"><%= error %></div>
+  <% } %>
+
+  <form action="/groups/new" method="POST" class="card-form">
+    <div class="form-group">
+      <label for="name">Group Name</label>
+      <input type="text" id="name" name="name" placeholder="e.g. Study Team, Project Squad…" required maxlength="100" autofocus>
+    </div>
+
+    <div class="form-group">
+      <label>Add Members <span class="hint-inline">(optional)</span></label>
+      <% if (users.length === 0) { %>
+        <p class="subtext">No other users to add yet.</p>
+      <% } else { %>
+        <div class="user-checklist">
+          <% users.forEach(u => { %>
+            <label class="check-item">
+              <input type="checkbox" name="members" value="<%= u.id %>">
+              <span class="check-avatar"><%= u.username.charAt(0).toUpperCase() %></span>
+              <span>@<%= u.username %></span>
+            </label>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">Create Group</button>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

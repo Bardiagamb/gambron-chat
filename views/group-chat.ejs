@@ -1,0 +1,111 @@
+<%- include('partials/header', { title: group.name }) %>
+
+<div class="chat-layout">
+  <!-- Sidebar -->
+  <aside class="chat-sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3><%= group.name %></h3>
+      <button class="btn btn-ghost btn-sm" id="toggleSidebar">✕</button>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="sidebar-label">Members (<%= members.length %>)</p>
+      <ul class="member-list">
+        <% members.forEach(m => { %>
+          <li class="member-item">
+            <span class="member-avatar"><%= m.username.charAt(0).toUpperCase() %></span>
+            <span>@<%= m.username %></span>
+            <% if (m.id === currentUserId) { %><span class="badge-you">you</span><% } %>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <% if (nonMembers.length > 0) { %>
+    <div class="sidebar-section">
+      <p class="sidebar-label">Invite People</p>
+      <form action="/groups/<%= group.id %>/invite" method="POST">
+        <div class="user-checklist user-checklist--sm">
+          <% nonMembers.forEach(u => { %>
+            <label class="check-item">
+              <input type="checkbox" name="newMembers" value="<%= u.id %>">
+              <span class="check-avatar check-avatar--sm"><%= u.username.charAt(0).toUpperCase() %></span>
+              <span>@<%= u.username %></span>
+            </label>
+          <% }) %>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full mt-8">Invite</button>
+      </form>
+    </div>
+    <% } %>
+  </aside>
+
+  <!-- Main chat area -->
+  <div class="chat-main">
+    <div class="chat-topbar">
+      <button class="btn btn-ghost btn-sm" id="openSidebar">
+        👥 Members &amp; Invite
+      </button>
+      <a href="/groups" class="btn btn-ghost btn-sm">← All Chats</a>
+    </div>
+
+    <div class="messages-wrap" id="messagesWrap">
+      <% if (messages.length === 0) { %>
+        <div class="empty-state">
+          <span class="empty-icon">✨</span>
+          <p>No messages yet. Say hello!</p>
+        </div>
+      <% } %>
+
+      <% messages.forEach(msg => { %>
+        <div class="message-row <%= msg.sender_id === currentUserId ? 'message-row--mine' : '' %>" data-message-id="<%= msg.id %>">
+          <% if (msg.sender_id !== currentUserId) { %>
+            <span class="msg-avatar"><%= msg.sender.charAt(0).toUpperCase() %></span>
+          <% } %>
+          <div class="message-bubble">
+            <% if (msg.sender_id !== currentUserId) { %>
+              <span class="msg-sender">@<%= msg.sender %></span>
+            <% } %>
+            <p class="msg-body"><%= msg.body %></p>
+            <span class="msg-time">
+              <%= new Date(msg.sent_at).toLocaleString('en-CA', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+            </span>
+
+            <!-- Reactions -->
+            <div class="reactions-row" id="reactions-<%= msg.id %>">
+              <% msg.reactions.forEach(r => { %>
+                <button class="reaction-chip <%= r.userReacted ? 'reaction-chip--active' : '' %>"
+                        data-message-id="<%= msg.id %>"
+                        data-emoji="<%= r.emoji %>"
+                        data-group-id="<%= group.id %>"
+                        title="<%= r.users %>">
+                  <%= r.emoji %> <span class="reaction-count"><%= r.count %></span>
+                </button>
+              <% }) %>
+              <button class="btn-add-emoji" data-message-id="<%= msg.id %>" title="Add reaction">＋</button>
+            </div>
+
+            <!-- Emoji picker (hidden by default) -->
+            <div class="emoji-picker" id="picker-<%= msg.id %>" style="display:none;">
+              <% ['👍','❤️','😂','😮','😢','🔥','🎉','👀','✅','💯'].forEach(e => { %>
+                <button class="emoji-option"
+                        data-message-id="<%= msg.id %>"
+                        data-emoji="<%= e %>"
+                        data-group-id="<%= group.id %>"><%= e %></button>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Send message form -->
+    <form action="/messages/send" method="POST" class="send-form">
+      <input type="hidden" name="groupId" value="<%= group.id %>">
+      <input type="text" name="body" class="send-input" placeholder="Type a message…" autocomplete="off" required>
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
